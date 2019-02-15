@@ -3,16 +3,28 @@ const express = require('express');
 const app = express();
 
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 
 const porductRoutes = require('./api/routes/products');
-
 const orderRoutes = require('./api/routes/orders');
 
 app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+//To remove CORS Erros
+app.use((req,res,next) =>{
+    res.header("Access-Control-Allow-Origin","*");
+    res.header("Origin, X-Request-with, Content-Type, Accept, Authorization");
+    if(res.method === 'OPTIONS'){
+        res.header('Access-Control-Allow-Methods','PUT, POST, PATCH, DELETE, GET');
+        return res.status(200).json({});
+    }
+    next();
+});
 
 //Routes which should handle requests
 app.use('/products', porductRoutes);
-
 app.use('/orders', orderRoutes);
 
 //middleware to custom error handling
